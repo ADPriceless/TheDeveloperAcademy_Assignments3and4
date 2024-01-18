@@ -81,10 +81,10 @@ class HauntedHouse:
                     break
                 case _: 
                     print('I don\'t understand that answer')
-        if self.dx != 0 or self.dy != 0:
-            self._move_player()
+        self._move_player()
 
     def _search_room(self) -> None:
+        '''Logic to search the room for a ghost'''
         if self.player_x == self.ghost_x \
             and self.player_y == self.ghost_y:
             print('You found the ghost!')
@@ -103,10 +103,11 @@ class HauntedHouse:
         elif self.player_y + self.dy > self.Y_MAX:
             print('Hmm... it looks like there is nothing over there')
         else:
-            self.player_x += self.dx
-            self.player_y += self.dy
-            self.valid_action = True
-        self.dx, self.dy = 0, 0
+            if self.dx != 0 or self.dy != 0:
+                self.player_x += self.dx
+                self.player_y += self.dy
+                self.valid_action = True
+            self.dx, self.dy = 0, 0
 
     def play(self):
         self._show_intro()
