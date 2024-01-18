@@ -13,28 +13,53 @@ class HauntedHouse:
     ) -> None:
         self.player_x, self.player_y = 0, 0
         self.house = reshape2d(rooms)
-        self.rooms_descriptions = room_descriptions
+        self.room_descriptions = room_descriptions
         self.playing = False
 
     def _show_intro(self) -> None:
         '''Print the intro'''
+        print('Intro')
 
     def _ask_to_play(self) -> None:
         '''Ask the player if they want to play'''
+        while True:
+            answer = input('Do you want to play? ').lower()
+            if answer in ('y', 'yes'):
+                self.playing = True
+                break
+            elif answer in ('n', 'no'):
+                self.playing = False
+                break
+            else:
+                print('I don\'t understand that answer')
 
     def _describe_room(self) -> None:
         '''Print room description'''
+        room = self.house[self.player_x][self.player_y]
+        description = self.room_descriptions[room]
+        print(f'You have entered the {room}! {description}')
 
     def _present_options(self) -> None:
         '''Print options that are available player'''
+        print('Here are your options: keep playing, quit')
 
     def _player_action(self) -> None:
         '''Take the action that the player chooses'''
+        while True:
+            action = input('What to do? ').lower()
+            if action in ('q', 'quit'):
+                self.playing = False
+                break
+            elif action == 'keep playing':
+                print('Ok')
+                break
+            else:
+                print('I don\'t understand that answer')
 
     def play(self):
         self._show_intro()
         self._ask_to_play()
-        if self.playing:
+        while self.playing:
             self._describe_room()
             self._present_options()
             self._player_action()
