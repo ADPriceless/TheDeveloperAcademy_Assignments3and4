@@ -14,6 +14,10 @@ class HauntedHouse:
         self.player_x, self.player_y = 0, 0
         self.house = reshape2d(rooms)
         self.room_descriptions = room_descriptions
+        self.dx, self.dy = 0, 0
+        self.X_MIN, self.X_MAX = 0, len(self.house) - 1
+        self.Y_MIN, self.Y_MAX = 0, len(self.house[0]) - 1
+        self.valid_action = False
         self.playing = False
 
     def _show_intro(self) -> None:
@@ -47,22 +51,52 @@ class HauntedHouse:
         '''Take the action that the player chooses'''
         while True:
             action = input('What to do? ').lower()
-            if action in ('q', 'quit'):
-                self.playing = False
-                break
-            elif action == 'keep playing':
-                print('Ok')
-                break
-            else:
-                print('I don\'t understand that answer')
+            match action.split(' '):
+                case ['quit']: 
+                    self.playing = False
+                    self.valid_action = True
+                    break
+                case [*_, 'left']: 
+                    self.dx = -1
+                    break
+                case [*_, 'right']: 
+                    self.dx = 1
+                    break
+                case [*_, 'up']: 
+                    self.dy = 1
+                    break
+                case [*_, 'down']: 
+                    self.dy = -1
+                    break
+                case _: 
+                    print('I don\'t understand that answer')
+        self._move_player()
+
+    def _move_player(self):
+        if self.player_x + self.dx < self.X_MIN:
+            print('Hmm... it looks like there is nothing over there')
+        elif self.player_x + self.dx > self.X_MAX:
+            print('Hmm... it looks like there is nothing over there')
+        elif self.player_y + self.dy < self.Y_MIN:
+            print('Hmm... it looks like there is nothing over there')
+        elif self.player_y + self.dy > self.Y_MAX:
+            print('Hmm... it looks like there is nothing over there')
+        else:
+            self.player_x += self.dx
+            self.player_y += self.dy
+            self.valid_action = True
+        self.dx, self.dy = 0, 0
 
     def play(self):
         self._show_intro()
         self._ask_to_play()
         while self.playing:
             self._describe_room()
-            self._present_options()
-            self._player_action()
+            while not self.valid_action:
+                self._present_options()
+                self._player_action()
+            self.valid_action = False
+        print('Goodbye!')
 
 
 def main():
