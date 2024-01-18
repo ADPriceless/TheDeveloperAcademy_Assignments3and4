@@ -2,7 +2,8 @@ import random
 
 
 def reshape2d(one_dim: list) -> list[list]:
-    '''reshape 1d `list` into 2d `list`. `one_dim` must have even number of elements'''
+    '''Basic reshape 1d `list` into 2d `list`. `one_dim` must have even number of elements. 
+    Could be changed to cover more cases (e.g. a 3x3 grid)'''
     length = len(one_dim)
     assert length % 2 == 0
     two_dim = [one_dim[:length//2], one_dim[length//2:]]
@@ -26,21 +27,28 @@ class HauntedHouse:
         self.ghost_x = random.randint(0, self.X_MAX)
         self.ghost_y = random.randint(0, self.Y_MAX)
 
-        self.playing = False
+        self.playing = True
+        self.game_over = False
+
 
     def _show_intro(self) -> None:
         '''Print the intro'''
         print('Intro')
 
-    def _ask_to_play(self) -> None:
+    def _initial_ask_to_play(self) -> None:
+        self._ask_to_play('Dare you enter? ')
+
+    def _ask_to_play(self, message: str) -> None:
         '''Ask the player if they want to play'''
         while True:
-            answer = input('Do you want to play? ').lower()
+            answer = input(message).lower()
             if answer in ('y', 'yes'):
                 self.playing = True
+                self.game_over = False
                 break
             elif answer in ('n', 'no'):
                 self.playing = False
+                self.game_over = True
                 break
             else:
                 print('I don\'t understand that answer')
@@ -62,6 +70,7 @@ class HauntedHouse:
             match action.split(' '):
                 case ['quit']: 
                     self.playing = False
+                    self.game_over = True
                     self.valid_action = True
                     break
                 case [*_, 'left']: 
@@ -89,35 +98,40 @@ class HauntedHouse:
             and self.player_y == self.ghost_y:
             print('You found the ghost!')
             self.valid_action = True
-            self.playing = False
+            self.game_over = True
         else:
             print('No ghost here!')
 
-    def _move_player(self):
+    def _move_player(self) -> None:
         if self.player_x + self.dx < self.X_MIN:
-            print('Hmm... it looks like there is nothing over there')
+            print('Hmm... it looks like you cannot go over there')
         elif self.player_x + self.dx > self.X_MAX:
-            print('Hmm... it looks like there is nothing over there')
+            print('Hmm... it looks like you cannot go over there')
         elif self.player_y + self.dy < self.Y_MIN:
-            print('Hmm... it looks like there is nothing over there')
+            print('Hmm... it looks like you cannot go over there')
         elif self.player_y + self.dy > self.Y_MAX:
-            print('Hmm... it looks like there is nothing over there')
+            print('Hmm... it looks like you cannot go over there')
         else:
             if self.dx != 0 or self.dy != 0:
                 self.player_x += self.dx
                 self.player_y += self.dy
                 self.valid_action = True
-            self.dx, self.dy = 0, 0
+        self.dx, self.dy = 0, 0
 
-    def play(self):
-        self._show_intro()
-        self._ask_to_play()
+    def _play_again(self) -> None:
+        self._ask_to_play('Play again? ')
+
+    def play(self) -> None:
         while self.playing:
-            self._describe_room()
-            while not self.valid_action:
-                self._present_options()
-                self._player_action()
-            self.valid_action = False
+            self._show_intro()
+            self._initial_ask_to_play()
+            while not self.game_over:
+                self._describe_room()
+                while not self.valid_action:
+                    self._present_options()
+                    self._player_action()
+                self.valid_action = False # reset valid_action for next turn
+            self._play_again()
         print('Goodbye!')
 
 
