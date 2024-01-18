@@ -1,3 +1,6 @@
+import random
+
+
 def reshape2d(one_dim: list) -> list[list]:
     '''reshape 1d `list` into 2d `list`. `one_dim` must have even number of elements'''
     length = len(one_dim)
@@ -11,13 +14,18 @@ class HauntedHouse:
                  rooms: list[str],
                  room_descriptions: dict[str, str]
     ) -> None:
-        self.player_x, self.player_y = 0, 0
         self.house = reshape2d(rooms)
         self.room_descriptions = room_descriptions
+        
+        self.player_x, self.player_y = 0, 0
         self.dx, self.dy = 0, 0
         self.X_MIN, self.X_MAX = 0, len(self.house) - 1
         self.Y_MIN, self.Y_MAX = 0, len(self.house[0]) - 1
         self.valid_action = False
+        
+        self.ghost_x = random.randint(0, self.X_MAX)
+        self.ghost_y = random.randint(0, self.Y_MAX)
+
         self.playing = False
 
     def _show_intro(self) -> None:
@@ -68,9 +76,22 @@ class HauntedHouse:
                 case [*_, 'down']: 
                     self.dy = -1
                     break
+                case ['search', *_, 'room']:
+                    self._search_room()
+                    break
                 case _: 
                     print('I don\'t understand that answer')
-        self._move_player()
+        if self.dx != 0 or self.dy != 0:
+            self._move_player()
+
+    def _search_room(self) -> None:
+        if self.player_x == self.ghost_x \
+            and self.player_y == self.ghost_y:
+            print('You found the ghost!')
+            self.valid_action = True
+            self.playing = False
+        else:
+            print('No ghost here!')
 
     def _move_player(self):
         if self.player_x + self.dx < self.X_MIN:
