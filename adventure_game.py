@@ -1,6 +1,6 @@
 import random
 
-from game_text import INTRO, ROOMS, DESCRIPTIONS, GHOST_FOUND
+from game_text import INTRO, ROOMS, DESCRIPTIONS, GHOST_FOUND, GHOST_NOT_FOUND
 
 
 def reshape2d(one_dim: list) -> list[list]:
@@ -17,13 +17,15 @@ class HauntedHouse:
                  intro: str,
                  rooms: list[str],
                  room_descriptions: dict[str, str],
-                 ghost_found
+                 ghost_found,
+                 ghost_not_found
     ) -> None:
         # variables for the map
         self.house = reshape2d(rooms)
         self.intro = intro
         self.room_descriptions = room_descriptions
         self.ghost_found = ghost_found
+        self.ghost_not_found = ghost_not_found
         
         # variables for the player
         self.player_x, self.player_y = 0, 0
@@ -116,7 +118,7 @@ class HauntedHouse:
             self.valid_action = True
             self.game_over = True
         else:
-            print('No ghost here!')
+            print('\n' + self.ghost_not_found)
 
     def _move_player(self) -> None:
         '''Logic to move player through the rooms. Ensures player does not go
@@ -156,7 +158,9 @@ class HauntedHouse:
 
 def main():
     room_descriptions = {room: desc for (room, desc) in zip(ROOMS, DESCRIPTIONS)}
-    haunted_house = HauntedHouse(INTRO, ROOMS, room_descriptions, GHOST_FOUND)
+    haunted_house = HauntedHouse(
+        INTRO, ROOMS, room_descriptions, GHOST_FOUND, GHOST_NOT_FOUND
+    )
     haunted_house.play()
 
 
