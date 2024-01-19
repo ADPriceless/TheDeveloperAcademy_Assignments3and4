@@ -1,5 +1,7 @@
 import random
 
+from game_text import INTRO, ROOMS, DESCRIPTIONS, GHOST_FOUND
+
 
 def reshape2d(one_dim: list) -> list[list]:
     '''Basic reshape 1d `list` into 2d `list`. `one_dim` must have even number of elements. 
@@ -12,12 +14,16 @@ def reshape2d(one_dim: list) -> list[list]:
 
 class HauntedHouse:
     def __init__(self, 
+                 intro: str,
                  rooms: list[str],
-                 room_descriptions: dict[str, str]
+                 room_descriptions: dict[str, str],
+                 ghost_found
     ) -> None:
         # variables for the map
         self.house = reshape2d(rooms)
+        self.intro = intro
         self.room_descriptions = room_descriptions
+        self.ghost_found = ghost_found
         
         # variables for the player
         self.player_x, self.player_y = 0, 0
@@ -38,7 +44,7 @@ class HauntedHouse:
 
     def _show_intro(self) -> None:
         '''Print the intro'''
-        print('Intro')
+        print(self.intro)
 
     def _initial_ask_to_play(self) -> None:
         self._ask_to_play('Dare you enter? ')
@@ -46,7 +52,7 @@ class HauntedHouse:
     def _ask_to_play(self, message: str) -> None:
         '''Ask the player if they want to play with custom message'''
         while True:
-            answer = input(message).lower()
+            answer = input('\n' + message).lower()
             if answer in ('y', 'yes'):
                 self.playing = True
                 self.game_over = False
@@ -62,12 +68,12 @@ class HauntedHouse:
         '''Print room description'''
         room = self.house[self.player_x][self.player_y]
         description = self.room_descriptions[room]
-        print(f'You have entered the {room}! {description}')
+        print(f'\nYou have entered the {room}! {description}')
 
     def _present_options(self) -> None:
         '''Print options that are available player. This function could be expanded to
         remove options that the user has attempted'''
-        print('Here are your options: go left, right, up, down or search room')
+        print('\nHere are your options: go left, right, up, down or search room')
 
     def _player_action(self) -> None:
         '''Take the action that the player chooses'''
@@ -106,7 +112,7 @@ class HauntedHouse:
         given more time to search for items to defeat the ghost, for example.'''
         if self.player_x == self.ghost_x \
             and self.player_y == self.ghost_y:
-            print('You found the ghost!')
+            print('\n' + self.ghost_found)
             self.valid_action = True
             self.game_over = True
         else:
@@ -115,7 +121,7 @@ class HauntedHouse:
     def _move_player(self) -> None:
         '''Logic to move player through the rooms. Ensures player does not go
         out of bounds'''
-        cant_go_there = 'Hmm... it looks like you cannot go over there'
+        cant_go_there = '\nHmm... it looks like you cannot go over there'
         if self.player_x + self.dx < self.X_MIN:
             print(cant_go_there)
         elif self.player_x + self.dx > self.X_MAX:
@@ -145,15 +151,12 @@ class HauntedHouse:
                     self._player_action()
                 self.valid_action = False # reset valid_action for next turn
             self._ask_to_play_again()
-        print('Goodbye!')
+        print('\nGoodbye... and beware!')
 
 
 def main():
-    ROOMS = ('Kitchen', 'Living Room','Dining Room', 'Toilet')
-    DESCRIPTIONS = ROOMS
     room_descriptions = {room: desc for (room, desc) in zip(ROOMS, DESCRIPTIONS)}
-
-    haunted_house = HauntedHouse(ROOMS, room_descriptions)
+    haunted_house = HauntedHouse(INTRO, ROOMS, room_descriptions, GHOST_FOUND)
     haunted_house.play()
 
 
